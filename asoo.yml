@@ -1,0 +1,41 @@
+deploy_info:
+  private_submodules: []
+
+server_setup:
+  check-docker:
+    sudo: true
+    commands:
+      - 'docker --version'
+      - 'docker-compose --version'
+  workspace-chmod:
+    sudo: true
+    commands:
+      - 'chmod 757 /opt/'
+
+environment_info:
+  application: 'hello'
+  application_version: '1.0'
+  application_service: 'web'
+  application_container_user: '0'
+  nginx_service: 'web'
+  nginx_virtual_port: '80'
+  workspace: '/opt/${object.server_id.technical_name}-${object.name}-${object.id}'
+  process_files:
+    - 'docker-compose.yml'
+    - 'html/index.html'
+  rebuild_files:
+    - 'Dockerfile'
+
+environment_setup:
+  list-workspace:
+    commands:
+      - 'ls -la'
+
+environment_test_info:
+  test_mute: true
+  test_error_regex: '^ERROR'
+  test_warn_regex: '^WARNING'
+  script_test:
+    service: 'web'
+    commands:
+      - 'sh -c "test -f /usr/share/nginx/html/index.html && echo OK || echo ERROR missing index"'
